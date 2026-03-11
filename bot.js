@@ -8,6 +8,14 @@ const WELCOME_PHOTO = "https://frimarion.github.io/flomossa/welcome.jpg";
 
 // ── /start — приветствие с фото ──────────────
 bot.onText(/\/start/, (msg) => {
+  const keyboard = {
+    keyboard: [
+      [{ text: "🌿 Открыть магазин", web_app: { url: MINI_APP_URL } }],
+      [{ text: "📞 Написать нам в канал" }],
+    ],
+    resize_keyboard: true,
+  };
+
   bot.sendPhoto(msg.chat.id, WELCOME_PHOTO, {
     caption:
       "🌿 *Flomossa* — живые флорариумы и моссариумы\n\n" +
@@ -15,28 +23,21 @@ bot.onText(/\/start/, (msg) => {
       "Каждый флорариум — ручная работа с любовью в Москве.\n\n" +
       "👇 Нажмите, чтобы открыть каталог",
     parse_mode: "Markdown",
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "🌿 Открыть магазин", web_app: { url: MINI_APP_URL } }],
-        [{ text: "📞 Написать нам", url: "https://t.me/Flomossa" }],
-      ],
-    },
+    reply_markup: keyboard,
   }).catch(() => {
-    // если фото не загрузилось — отправляем без фото
     bot.sendMessage(msg.chat.id,
       "🌿 *Добро пожаловать в Flomossa!*\n\n" +
       "Магазин живых флорариумов и моссариумов.\n" +
       "Каждый — ручная работа с любовью 🔮\n\n" +
       "👇 Нажмите, чтобы открыть каталог",
-      {
-        parse_mode: "Markdown",
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "🌿 Открыть магазин", web_app: { url: MINI_APP_URL } }],
-            [{ text: "📞 Написать нам", url: "https://t.me/Flomossa" }],
-          ],
-        },
-      }
+      { parse_mode: "Markdown", reply_markup: keyboard }
+    );
+  });
+
+  // Обработка кнопки "Написать нам"
+  bot.onText(/Написать нам/, (m) => {
+    bot.sendMessage(m.chat.id,
+      "📞 Наш канал: @Flomossa\n\nПишите, с удовольствием ответим! 🌿"
     );
   });
 });
