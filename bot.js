@@ -4,28 +4,47 @@ const { BOT_TOKEN, ADMIN_CHAT_ID, MINI_APP_URL } = require("./config");
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log("🌿 Flomossa Bot запущен!");
 
-// ── /start — открываем мини-апп ──────────────
+const WELCOME_PHOTO = "https://frimarion.github.io/flomossa/welcome.jpg";
+
+// ── /start — приветствие с фото ──────────────
 bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(msg.chat.id,
-    `🌿 Добро пожаловать в *Flomossa*!\n\nМагазин живых флорариумов и моссариумов.\nКаждый — ручная работа с любовью 🔮\n\nНажмите кнопку ниже, чтобы открыть каталог 👇`,
-    {
-      parse_mode: "Markdown",
-      reply_markup: {
-        inline_keyboard: [[
-          {
-            text: "🌿 Открыть магазин",
-            web_app: { url: MINI_APP_URL }
-          }
-        ]]
+  bot.sendPhoto(msg.chat.id, WELCOME_PHOTO, {
+    caption:
+      "🌿 *Flomossa* — живые флорариумы и моссариумы\n\n" +
+      "Создаём маленькие миры из мха и растений в стекле 🔮\n" +
+      "Каждый флорариум — ручная работа с любовью в Москве.\n\n" +
+      "👇 Нажмите, чтобы открыть каталог",
+    parse_mode: "Markdown",
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "🌿 Открыть магазин", web_app: { url: MINI_APP_URL } }],
+        [{ text: "📞 Написать нам", url: "https://t.me/Flomossa" }],
+      ],
+    },
+  }).catch(() => {
+    // если фото не загрузилось — отправляем без фото
+    bot.sendMessage(msg.chat.id,
+      "🌿 *Добро пожаловать в Flomossa!*\n\n" +
+      "Магазин живых флорариумов и моссариумов.\n" +
+      "Каждый — ручная работа с любовью 🔮\n\n" +
+      "👇 Нажмите, чтобы открыть каталог",
+      {
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "🌿 Открыть магазин", web_app: { url: MINI_APP_URL } }],
+            [{ text: "📞 Написать нам", url: "https://t.me/Flomossa" }],
+          ],
+        },
       }
-    }
-  );
+    );
+  });
 });
 
 // ── Получаем заказ из мини-аппа ──────────────
 bot.on("web_app_data", async (msg) => {
-  const userId = msg.from.id;
-  const username = msg.from.username ? `@${msg.from.username}` : "нет username";
+  const userId    = msg.from.id;
+  const username  = msg.from.username ? `@${msg.from.username}` : "нет username";
   const firstName = msg.from.first_name || "";
 
   let order;
@@ -38,7 +57,7 @@ bot.on("web_app_data", async (msg) => {
 
   // Подтверждение клиенту
   await bot.sendMessage(userId,
-    `✅ *Ваш заказ принят!*\n\n` +
+    `✅ *Заказ принят!*\n\n` +
     `👤 ${order.name}\n` +
     `📱 ${order.phone}\n` +
     `🏠 ${order.address}\n` +
@@ -46,7 +65,7 @@ bot.on("web_app_data", async (msg) => {
     `\n🛒 *Состав заказа:*\n${order.items.map(i => `  • ${i}`).join("\n")}\n\n` +
     `💰 *Итого: ${order.total}*\n\n` +
     `━━━━━━━━━━━━━━\n` +
-    `🌿 Мы свяжемся с вами в течение 1–2 часов.\n` +
+    `🌿 Свяжемся с вами в течение 1–2 часов.\n` +
     `Спасибо, что выбрали *Flomossa*! 💚`,
     { parse_mode: "Markdown" }
   );
@@ -58,7 +77,7 @@ bot.on("web_app_data", async (msg) => {
     `📱 ${order.phone}\n` +
     `🏠 ${order.address}\n` +
     `💬 ${order.comment}\n` +
-    `🚚 Доставка: ${order.delivery === "delivery" ? "курьер" : "самовывоз"}\n\n` +
+    `🚚 ${order.delivery === "delivery" ? "Доставка курьером" : "Самовывоз"}\n\n` +
     `🔗 Telegram: ${username} (${firstName}, ID: ${userId})\n\n` +
     `🛒 *Состав:*\n${order.items.map(i => `  • ${i}`).join("\n")}\n\n` +
     `💰 *Итого: ${order.total}*`,
