@@ -1,0 +1,7 @@
+{
+  "name": "flomossa-miniapp",
+  "version": "2.0.0",
+  "main": "bot.js",
+  "scripts": { "start": "node bot.js" },
+  "dependencies": { "node-telegram-bot-api": "^0.66.0" }
+}
