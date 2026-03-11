@@ -175,6 +175,17 @@ html, body {
   font-size: 13px; font-weight: 500;
   color: var(--forest);
 }
+.card-stock {
+  font-size: 11px; color: var(--sage);
+  margin-top: 3px;
+}
+.card-stock.low { color: #c0783a; }
+.modal-stock {
+  display: inline-block;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.06em;
+  color: var(--sage); margin-top: 4px;
+}
+.modal-stock.low { color: #c0783a; }
 .card-add {
   margin-top: 10px;
   width: 100%; padding: 8px;
@@ -196,9 +207,7 @@ html, body {
   background: var(--forest); color: var(--white);
   border: none; font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
 }
-.card-counter button:active { background: var(--sage); }
 .card-counter span {
   font-size: 14px; font-weight: 500; color: var(--forest);
 }
@@ -441,7 +450,6 @@ textarea.form-input { resize: none; height: 80px; }
     <button class="cat-chip active" onclick="filterCat('all', this)">Все</button>
     <button class="cat-chip" onclick="filterCat('florariums', this)">🌿 Флорариумы</button>
     <button class="cat-chip" onclick="filterCat('mossariums', this)">🌱 Моссариумы</button>
-    <button class="cat-chip" onclick="filterCat('gifts', this)">🎁 Подарки</button>
   </div>
 </section>
 
@@ -545,17 +553,68 @@ if (tg) {
 }
 
 // ── DATA ─────────────────────────────────────
+const BASE = 'https://frimarion.github.io/flomossa/';
 const PRODUCTS = [
-  { id:'fl_01', cat:'florariums', emoji:'🌿', name:'Флорариум «Тропический лес»', price:3500, desc:'Маленький тропический мир в шаровидной колбе. Папоротники, фиттония и ярко-зелёный мох создают атмосферу влажного леса.', size:'Ø 20 см, высота 25 см', plants:'Папоротник нефролепис, фиттония, мох кукушкин лён', care:'Полив 1 раз в 2 недели, рассеянный свет' },
-  { id:'fl_02', cat:'florariums', emoji:'💎', name:'Флорариум «Нефритовый сад»', price:4800, desc:'Элегантная геометрическая призма с нежными тропическими растениями. Стильный акцент для любого интерьера.', size:'15 × 15 × 30 см', plants:'Пилея, хлорофитум карликовый, мох сфагнум', care:'Полив 1 раз в 10 дней, яркий непрямой свет' },
-  { id:'fl_03', cat:'florariums', emoji:'🔮', name:'Флорариум «Закрытый мир»', price:5900, desc:'Самодостаточная закрытая экосистема. Почти не требует ухода — влага циркулирует внутри сама.', size:'Ø 25 см, высота 35 см', plants:'Мох, папоротник, клевер, плющ миниатюрный', care:'Полив 1 раз в месяц или реже' },
-  { id:'fl_04', cat:'florariums', emoji:'🌵', name:'Флорариум «Суккулентный оазис»', price:2900, desc:'Пустынная композиция с суккулентами и декоративным песком. Минимальный уход, максимальная декоративность.', size:'Ø 18 см, высота 20 см', plants:'Суккуленты микс, кактус, декоративный камень', care:'Полив 1 раз в 3 недели, яркий свет' },
-  { id:'mo_01', cat:'mossariums', emoji:'🍃', name:'Моссариум «Японский сад»', price:3200, desc:'Медитативная композиция в стиле ваби-куса. Подушки мха, камни и веточки создают ощущение покоя.', size:'20 × 15 × 10 см', plants:'Мох кукушкин лён, мох ямато, декоративные камни', care:'Опрыскивание 2–3 раза в неделю' },
-  { id:'mo_02', cat:'mossariums', emoji:'🌫️', name:'Моссариум «Туманный лес»', price:4200, desc:'Нежные подушки светлого мха в прямоугольном аквариуме. Ощущение раннего утра в лесу после дождя.', size:'30 × 20 × 20 см', plants:'Мох сфагнум, мох ямато, коряга', care:'Опрыскивание раз в 2 дня' },
-  { id:'mo_03', cat:'mossariums', emoji:'🫧', name:'Моссариум «Мини-оазис»', price:1800, desc:'Компактный моссариум в стеклянном шаре. Маленький живой мир, который умещается на ладони.', size:'Ø 12 см', plants:'Мох кукушкин лён, декоративный камень', care:'Опрыскивание 1–2 раза в неделю' },
-  { id:'gi_01', cat:'gifts', emoji:'🎀', name:'Набор «С днём рождения»', price:5500, desc:'Флорариум + открытка ручной работы + инструкция в красивой крафтовой коробке. Готов к вручению!', size:'Флорариум Ø 20 см + упаковка', plants:'На выбор: тропический или суккулентный', care:'Инструкция вложена в комплект' },
-  { id:'gi_02', cat:'gifts', emoji:'🛠️', name:'Набор «Сделай сам» DIY', price:2200, desc:'Всё для создания собственного флорариума: сосуд, субстрат, мох, камни и пошаговая инструкция.', size:'Сосуд Ø 15 см + материалы', plants:'Мох + растения на выбор', care:'Подробная инструкция внутри' },
-  { id:'gi_03', cat:'gifts', emoji:'🏢', name:'Корпоративный подарок', price:7500, desc:'Флорариум в фирменной упаковке. Идеально для коллег, партнёров и клиентов. От 5 штук.', size:'Флорариум Ø 25 см + упаковка', plants:'На выбор по согласованию', care:'Открытка и инструкция в комплекте' },
+  {
+    id:'p1', cat:'mossariums',
+    photo: BASE+'6.jpg',
+    name:'Девочка ангел со мхом',
+    price:1600, stock:1,
+    desc:'Очаровательная фигурка ангела с шапкой из стабилизированного фиолетового мха и нежными цветами. Уникальный декоративный подарок ручной работы.',
+    size:'16 × 11 см',
+    plants:'Стабилизированный мох, декоративные цветы',
+    care:'Уход не требуется — стабилизированный мох не поливают'
+  },
+  {
+    id:'p2', cat:'mossariums',
+    photo: BASE+'1.jpg',
+    name:'Грут со стабилизированным мхом',
+    price:1700, stock:2,
+    desc:'Знаменитый герой Marvel с пышной шапкой из стабилизированного мха и сухоцветами. Отличный подарок для любого возраста!',
+    size:'24 × 13 см',
+    plants:'Стабилизированный мох, сухоцветы',
+    care:'Уход не требуется — стабилизированный мох не поливают'
+  },
+  {
+    id:'p3', cat:'florariums',
+    photo: BASE+'2.jpg',
+    name:'Флорариум «Геометрия»',
+    price:4000, stock:1,
+    desc:'Живые суккуленты и мох в стильной геометрической стеклянной вазе. Ракушки и декоративный гравий создают уникальную атмосферу.',
+    size:'16 × 18 см',
+    plants:'Суккуленты, мох, сухоцветы, ракушки',
+    care:'Полив 1 раз в 2–3 недели, яркий свет'
+  },
+  {
+    id:'p4', cat:'florariums',
+    photo: BASE+'3.jpg',
+    name:'Флорариум «Сердце»',
+    price:5200, stock:1,
+    desc:'Живые суккуленты в геометрической вазе в форме сердца — идеальный романтичный подарок. Декоративный гравий и сухоцветы.',
+    size:'22 × 18 см',
+    plants:'Суккуленты, сухоцветы, декоративный гравий',
+    care:'Полив 1 раз в 2–3 недели, яркий свет'
+  },
+  {
+    id:'p5', cat:'mossariums',
+    photo: BASE+'4.jpg',
+    name:'Бонсай из стабилизированного мха',
+    price:12000, stock:1,
+    desc:'Величественное дерево бонсай, полностью покрытое натуральным стабилизированным мхом. Живая скульптура, которая не требует ухода.',
+    size:'40 × 40 см',
+    plants:'Стабилизированный мох, натуральная кора',
+    care:'Уход не требуется — стабилизированный мох не поливают'
+  },
+  {
+    id:'p6', cat:'florariums',
+    photo: BASE+'5.jpg',
+    name:'Флорариум «Волшебный бокал»',
+    price:2000, stock:3,
+    desc:'Целый мини-мир в бокале: дерево из мха, живые растения, водоём с рыбкой 🐠 и загадочные кристаллы 💎. Водоём светится в темноте! Притягивает взгляд и дарит позитивные эмоции.',
+    size:'20 × 11 см',
+    plants:'Мох, мини-растения, декоративная рыбка, светящиеся кристаллы',
+    care:'Опрыскивание 1–2 раза в неделю'
+  },
 ];
 
 // ── STATE ────────────────────────────────────
@@ -570,18 +629,23 @@ function renderProducts() {
   const filtered = currentCat === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentCat);
   container.innerHTML = filtered.map((p, i) => {
     const qty = cart[p.id] || 0;
+    const inCartQty = Math.min(qty, p.stock);
+    const soldOut = p.stock === 0;
+    const stockLabel = soldOut ? 'Нет в наличии' : `В наличии: ${p.stock} шт.`;
+    const stockClass = p.stock <= 1 ? 'low' : '';
     return `
     <div class="card" style="animation-delay:${i * 0.06}s" onclick="openModal('${p.id}')">
-      <div class="card-img">${p.emoji}</div>
+      <div class="card-img"><img src="${p.photo}" style="width:100%;height:100%;object-fit:cover" loading="lazy"/></div>
       <div class="card-body">
         <div class="card-name">${p.name}</div>
         <div class="card-price">${p.price.toLocaleString('ru')} ₽</div>
-        ${qty === 0
+        <div class="card-stock ${stockClass}">${stockLabel}</div>
+        ${soldOut ? '' : qty === 0
           ? `<button class="card-add" onclick="event.stopPropagation();addToCart('${p.id}')">В корзину</button>`
           : `<div class="card-counter">
                <button onclick="event.stopPropagation();removeFromCart('${p.id}')">−</button>
                <span>${qty}</span>
-               <button onclick="event.stopPropagation();addToCart('${p.id}')">+</button>
+               <button onclick="event.stopPropagation();addToCart('${p.id}')" ${qty >= p.stock ? 'disabled style="opacity:0.4"' : ''}>+</button>
              </div>`
         }
       </div>
@@ -632,18 +696,31 @@ function openModal(id) {
 function refreshModal() {
   const p = currentProduct; if (!p) return;
   const qty = cart[p.id] || 0;
-  document.getElementById('modalImg').textContent   = p.emoji;
+  const soldOut = p.stock === 0;
+  document.getElementById('modalImg').innerHTML = `<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover"/>`;
   document.getElementById('modalTitle').textContent = p.name;
   document.getElementById('modalPrice').textContent = p.price.toLocaleString('ru') + ' ₽';
   document.getElementById('modalDesc').textContent  = p.desc;
+  const stockClass = p.stock <= 1 ? 'low' : '';
+  const stockText = soldOut ? '❌ Нет в наличии' : `✅ В наличии: ${p.stock} шт.`;
   document.getElementById('modalDetails').innerHTML = `
     <div class="modal-detail"><span class="modal-detail-icon">📐</span><div><div class="modal-detail-label">Размер</div>${p.size}</div></div>
     <div class="modal-detail"><span class="modal-detail-icon">🌿</span><div><div class="modal-detail-label">Состав</div>${p.plants}</div></div>
     <div class="modal-detail"><span class="modal-detail-icon">💧</span><div><div class="modal-detail-label">Уход</div>${p.care}</div></div>
+    <div class="modal-detail"><span class="modal-detail-icon">📦</span><div><div class="modal-detail-label">Наличие</div><span class="modal-stock ${stockClass}">${stockText}</span></div></div>
   `;
   const btn = document.getElementById('modalBtn');
-  btn.textContent = qty ? `В корзине: ${qty} шт. — добавить ещё` : 'Добавить в корзину';
-  btn.className = 'btn-primary' + (qty ? ' in-cart' : '');
+  if (soldOut) {
+    btn.textContent = 'Нет в наличии';
+    btn.disabled = true;
+    btn.className = 'btn-primary';
+    btn.style.opacity = '0.4';
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.textContent = qty ? `В корзине: ${qty} шт. — добавить ещё` : 'Добавить в корзину';
+    btn.className = 'btn-primary' + (qty ? ' in-cart' : '');
+  }
 }
 function modalAddToCart() { addToCart(currentProduct.id); }
 function closeModal() {
@@ -676,7 +753,7 @@ function renderCart() {
     const p = PRODUCTS.find(x => x.id === id);
     if (!p) return '';
     return `<div class="cart-item">
-      <span class="cart-item-emoji">${p.emoji}</span>
+      <img src="${p.photo}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0"/>
       <div class="cart-item-info">
         <div class="cart-item-name">${p.name}</div>
         <div class="cart-item-price">${(p.price * qty).toLocaleString('ru')} ₽</div>
